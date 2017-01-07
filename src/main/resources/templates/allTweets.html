@@ -14,18 +14,20 @@
         <table class="table table-striped table-bordered table-hover" id="tweetTable">
             <thead>
             <tr>
-                <th>tweetId</th>
+                <th>Id</th>
+                <th>Tweet Id</th>
                 <th>Original Tweet User</th>
                 <th>Bot Account</th>
-                <th>hasReplyed</th>
-                <th>hasLiked</th>
-                <th>hasRetweeted</th>
-                <th>hasFollowed</th>
-                <th>tweetContents</th>
+                <th>Did we reply to them?</th>
+                <th>Did we like them?</th>
+                <th>Did we retweet them?</th>
+                <th>Did we follow?</th>
+                <th>Tweet Contents</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="row : ${tweets}">
+                <td th:text="${row.id}"></td>
                 <td th:text="${row.tweetId}"></td>
                 <td th:text="${row.userNameOfTweeter}"></td>
                 <td th:text="${row.account.name}"></td>

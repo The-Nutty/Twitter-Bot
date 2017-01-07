@@ -16,13 +16,18 @@ import java.util.List;
 @Controller
 public class TweetsController {
 
+    public static final String ENDPOINT_TWEETS = "/tweets";
+
+    public static final String VIEW_TWEETS = "allTweets";
+
+    public static final String MODEL_ATTR_TWEETS_LIST = "tweets";
     @Autowired
     TwitterActionRepository twitterActionRepository;
 
-    @RequestMapping("/tweets")
+    @RequestMapping(ENDPOINT_TWEETS)
     public ModelAndView getTweets(Model model){
         List<TwitterAction> all = twitterActionRepository.findAll();
-        model.addAttribute("tweets", all);
-        return new ModelAndView("allTweets");
+        model.addAttribute(MODEL_ATTR_TWEETS_LIST, all);
+        return new ModelAndView(VIEW_TWEETS);
     }
 }

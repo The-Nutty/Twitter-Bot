@@ -22,21 +22,28 @@ import java.util.List;
 @Controller
 public class UsersController {
 
+    public static final String ENDPOINT_USERS = "/users";
+    public static final String ENDPOINT_INDEX = "/";
+    public static final String ENDPOINT_TOGGLE_BOT = "/users/run/{id}";
+
+    public static final String VIEW_ACCOUNTS = "allAccounts";
+
+    public static final String MODEL_ATTR_USERS_LIST = "users";
     @Autowired
     AccountRepository accountRepository;
 
     @Autowired
     TwitterActionRepository twitterActionRepository;
 
-    @RequestMapping("/users")
+    @RequestMapping(ENDPOINT_USERS)
     public ModelAndView getAllUsers(Model model){
         List<Account> all = accountRepository.findAll();
 
-        model.addAttribute("users", all);
-        return new ModelAndView("allAccounts");
+        model.addAttribute(MODEL_ATTR_USERS_LIST, all);
+        return new ModelAndView(VIEW_ACCOUNTS);
     }
 
-    @RequestMapping("/users/run/{id}")
+    @RequestMapping(ENDPOINT_TOGGLE_BOT)
     public RedirectView runUser(@PathVariable("id") Long userId){
         Account account = accountRepository.findOne(userId);
         if (account.isRunning()) {
@@ -47,14 +54,14 @@ public class UsersController {
             taskExecutor.execute(new TwitterBotTask(twitterActionRepository, accountRepository, account));
         }
         accountRepository.save(account);
-        return new RedirectView("/users");
+        return new RedirectView(ENDPOINT_USERS);
     }
 
     /**
      * temp call to redirect to the users page when a user gose to the index
      */
-    @RequestMapping("/")
+    @RequestMapping(ENDPOINT_INDEX)
     public RedirectView homePage(){
-        return new RedirectView("/users");
+        return new RedirectView(ENDPOINT_USERS);
     }
 }

@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by Tom Hazell on 06/01/2017.
+ * Class used to persist all the accounds/bots we have, stored in a DB using {@link AccountRepository}
  */
 @Entity
 public class Account {

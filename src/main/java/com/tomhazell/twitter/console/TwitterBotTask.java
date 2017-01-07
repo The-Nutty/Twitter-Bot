@@ -1,16 +1,14 @@
 package com.tomhazell.twitter.console;
 
-import org.slf4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COOLDOWN;
 
 /**
  * Created by Tom Hazell on 06/01/2017.
@@ -61,10 +59,8 @@ public class TwitterBotTask implements Runnable {
     }
 
     /**
-     * When called this will proform multaple searches one for each of hte users querys, it will filter them ifd nessery
+     * When called this will preform multiple searches one for each of hte users query's, it will filter them if nessery
      * then enter them
-     * <p>
-     * Currently we just ignore the search going on when we get rate limited should we??
      */
     private void search() {
         for (String queryString : account.getQuerys().split(",")) {
@@ -75,7 +71,7 @@ public class TwitterBotTask implements Runnable {
             }
 
             Query query = new Query();
-            query.setQuery(queryString + " min_retweets:20");//   -vote -filter:retweets
+            query.setQuery(queryString + " min_retweets:5 -filter:retweets");//   -vote -filter:retweets
             query.setResultType(account.getResultType());
             query.setCount(99);
 
@@ -87,29 +83,24 @@ public class TwitterBotTask implements Runnable {
                 calendar.setTime(new Date());
                 calendar.add(Calendar.DAY_OF_YEAR, -4);
 //                query.setSince(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
-
             }
 
             try {
                 QueryResult search = twitter.search(query);
+                logger.error("Got " + search.getTweets().size() + " Search results");
                 tweetsToEnter.addAll(search.getTweets());
             } catch (TwitterException e) {
-                handleError(e);
+                handleTwitterError(e);
             }
-
-            enter();//enter the compotitions
 
             //sleep to evade rate limit
-            try {
-                Thread.sleep(randomiseTime(TwitterBotApplication.SEARCH_TIME_OUT));
-            } catch (InterruptedException e) {
-                logger.error("Failed to sleep", e);
-            }
+            sleep(TwitterBotApplication.SEARCH_TIME_OUT);
+
+            enter();//enter the competition's
         }
     }
 
-    private void handleError(TwitterException e) {
-
+    private void handleTwitterError(TwitterException e) {
         //if we are rate limited sleep for 10 mins
         if (e.exceededRateLimitation()) {
             logger.error("Failed to search for tweets or retweet, sleeping for 10 mins...", e);
@@ -118,11 +109,7 @@ public class TwitterBotTask implements Runnable {
             account.setOnRatelimitCooldown(true);
             accountRepository.save(account);
 
-            try {
-                Thread.sleep(1000 * 60 * 10);//10 mins
-            } catch (InterruptedException e1) {
-                logger.error("Failed to sleep", e);
-            }
+            sleep(RATE_LIMIT_COOLDOWN);
 
             //update the account to show it is no longer being rate limited so the user knows
             account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
@@ -131,32 +118,11 @@ public class TwitterBotTask implements Runnable {
         }else{
             //wait anyway as to not exeded rate limits
             logger.error("An error occurred", e);
-            try {
-                Thread.sleep(randomiseTime(TwitterBotApplication.RETWEET_TIME_OUT));
-            } catch (InterruptedException e1) {
-                logger.error("Failed to sleep", e1);
-            }
+            sleep(TwitterBotApplication.RETWEET_TIME_OUT);
         }
     }
 
-//    private void filterAndAddTweets(List<Status> tweets) {
-//        //TODO add things
-//        //Filter out tweets containg phrases
-//        //min retweets
-//        //
-//        for (Status tweet : tweets) {
-//            if (tweet.getRetweetCount() >= 20) {
-//                tweetsToEnter.add(tweet);
-////                tweet.getUser().getStatusCount
-//            }else{
-//                logger.error("Not Adding tweet (" + tweet.getRetweetCount() + "): " + tweet.getText());
-//            }
-//        }
-//    }
-
-
     private void enter() {
-        List<Status> tweetsToRetry = new ArrayList<>();
         for (Status tweet : tweetsToEnter) {
             logger.error("Interacting with tweet with ID " + tweet.getId());
             //if we have been told to stop then stop
@@ -175,11 +141,7 @@ public class TwitterBotTask implements Runnable {
                     twitter.retweetStatus(tweet.getId());
                     action.setHasRetweeted(true);
 
-                    try {
-                        Thread.sleep(randomiseTime(TwitterBotApplication.RETWEET_TIME_OUT));
-                    } catch (InterruptedException e) {
-                        logger.error("Failed to sleep", e);
-                    }
+                    sleep(TwitterBotApplication.RETWEET_TIME_OUT);
                 }
 
                 //check if we need to like
@@ -187,11 +149,7 @@ public class TwitterBotTask implements Runnable {
                     twitter.createFavorite(tweet.getId());
                     action.setHasLiked(true);
 
-                    try {
-                        Thread.sleep(randomiseTime(TwitterBotApplication.LIKE_TIME_OUT));
-                    } catch (InterruptedException e) {
-                        logger.error("Failed to sleep", e);
-                    }
+                    sleep(TwitterBotApplication.LIKE_TIME_OUT);
                 }
 
                 //check if we need to reply
@@ -200,45 +158,49 @@ public class TwitterBotTask implements Runnable {
                     twitter.updateStatus(reply);
                     action.setHasRetweeted(true);
 
-                    try {
-                        Thread.sleep(randomiseTime(TwitterBotApplication.REPLY_TIME_OUT));
-                    } catch (InterruptedException e) {
-                        logger.error("Failed to sleep", e);
-                    }
+                    sleep(TwitterBotApplication.REPLY_TIME_OUT);
                 }
 
                 if (tweet.getText().toLowerCase().contains("follow") || tweet.getText().toLowerCase().contains("following")){
                     twitter.friendsFollowers().createFriendship(tweet.getUser().getId());
                     action.setHasFollowed(true);
 
-                    try {
-                        Thread.sleep(randomiseTime(TwitterBotApplication.FOLLOW_TIME_OUT));
-                    } catch (InterruptedException e) {
-                        logger.error("Failed to sleep", e);
-                    }
+                    sleep(TwitterBotApplication.FOLLOW_TIME_OUT);
                 }
 
                 twitterActionRepository.save(action);
 
             } catch (TwitterException e) {
-//                tweetsToRetry.add(tweet);//we may wantto black list it in this case not sure
-                //TODO i dont think we wantto retry not sure
-                handleError(e);
+                handleTwitterError(e);
             }
-
         }
 
         //clear all of the old tweets
-        //add the tweets that failed back..
         tweetsToEnter.clear();
-        tweetsToEnter.addAll(tweetsToRetry);
     }
 
+    /**
+     * Checks if the bot should still be running by checking the running field in Account
+     * @return true if we should continue to run false otherwise
+     */
     private boolean checkIsRunning() {
         account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
         return account.isRunning();
     }
 
+    private void sleep(int millis) {
+        try {
+            Thread.sleep(randomiseTime(millis));
+        } catch (InterruptedException e) {
+            logger.error("Failed to sleep", e);
+        }
+    }
+
+    /**
+     * This multaplys the input time by 0.8 to 1.2 randomly genarated in order to not seem like a bot
+     * @param time the time you want to use
+     * @return the time when multiplied by this factor
+     */
     private int randomiseTime(int time){
         return (int) (time * (0.8d + ThreadLocalRandom.current().nextDouble(0.4)));
 
