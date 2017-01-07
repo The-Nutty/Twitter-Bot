@@ -37,7 +37,7 @@ public class TwitterBotTask implements Runnable {
 
     @Override
     public void run() {
-        logger.error("starting to run bot for" + account.getName());
+        logger.error("starting to run bot for " + account.getName());
         //initiate twitter instance and login
         twitter = new TwitterFactory().getInstance();
         twitter.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
@@ -75,7 +75,7 @@ public class TwitterBotTask implements Runnable {
             }
 
             Query query = new Query();
-            query.setQuery(queryString + "min_retweets:20 -filter:retweets -vote");
+            query.setQuery(queryString + " min_retweets:20 -filter:retweets -vote");
             query.setResultType(account.getResultType());
             query.setCount(100);
 
