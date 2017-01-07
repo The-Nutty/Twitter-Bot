@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="fragments/common_includes :: head"></head>
+<body>
+<div class="container">
+
+    <div th:include="fragments/navbar :: navbar"></div>
+    <div class="page-header">
+        <h1>All Users</h1>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>name</th>
+                <th>Querys</th>
+                <th>Result Type</th>
+                <th>Running?</th>
+                <th>On rate limit cooldown</th>
+                <th>Toggle Runnoing</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${users}">
+                <td th:text="${row.name}"></td>
+                <td th:text="${row.querys}"></td>
+                <td th:text="${row.resultType}"></td>
+                <td th:text="${row.running}"></td>
+                <td th:text="${row.onRatelimitCooldown}"></td>
+                <td><a class="btn btn-default"
+                       th:href="@{/users/run/{id}(id=${row.id})}">run</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
