@@ -75,9 +75,9 @@ public class TwitterBotTask implements Runnable {
             }
 
             Query query = new Query();
-            query.setQuery(queryString + " min_retweets:20 -filter:retweets -vote");
+            query.setQuery(queryString + " min_retweets:20");//   -vote -filter:retweets
             query.setResultType(account.getResultType());
-            query.setCount(100);
+            query.setCount(99);
 
             //if the sinceId != 0 (meaning we have used this account previously) then only get tweets from the last
             if (sinceId != 0) {
@@ -86,7 +86,7 @@ public class TwitterBotTask implements Runnable {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
                 calendar.add(Calendar.DAY_OF_YEAR, -4);
-                query.setSince(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
+//                query.setSince(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
 
             }
 
@@ -109,10 +109,10 @@ public class TwitterBotTask implements Runnable {
     }
 
     private void handleError(TwitterException e) {
-        logger.error("Failed to search for tweets or retweet, sleeping for 10 mins...", e);
 
         //if we are rate limited sleep for 10 mins
         if (e.exceededRateLimitation()) {
+            logger.error("Failed to search for tweets or retweet, sleeping for 10 mins...", e);
             //update the account to show it is being rate limited so the user knows
             account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
             account.setOnRatelimitCooldown(true);
@@ -128,6 +128,14 @@ public class TwitterBotTask implements Runnable {
             account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
             account.setOnRatelimitCooldown(false);
             accountRepository.save(account);
+        }else{
+            //wait anyway as to not exeded rate limits
+            logger.error("An error occurred", e);
+            try {
+                Thread.sleep(randomiseTime(TwitterBotApplication.RETWEET_TIME_OUT));
+            } catch (InterruptedException e1) {
+                logger.error("Failed to sleep", e1);
+            }
         }
     }
 
@@ -148,10 +156,9 @@ public class TwitterBotTask implements Runnable {
 
 
     private void enter() {
-        logger.error("Entered");
         List<Status> tweetsToRetry = new ArrayList<>();
         for (Status tweet : tweetsToEnter) {
-            logger.error("doing tweet stuff");
+            logger.error("Interacting with tweet with ID " + tweet.getId());
             //if we have been told to stop then stop
             if (!checkIsRunning()){
                 break;
@@ -161,7 +168,7 @@ public class TwitterBotTask implements Runnable {
             action.setTweetId(tweet.getId());
             action.setTweetContents(tweet.getText());
             action.setAccount(account);
-            action.setUserNameOfTweeter(tweet.getInReplyToScreenName());
+            action.setUserNameOfTweeter(tweet.getUser().getName());
             try {
                 //check if we need to Rt
                 if (tweet.getText().toLowerCase().contains("rt") || tweet.getText().toLowerCase().contains("retweet")) {

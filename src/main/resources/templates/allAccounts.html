@@ -10,7 +10,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover">
+        <table class="table table-striped table-bordered table-hover" id="tweetTable">
             <thead>
             <tr>
                 <th>name</th>
@@ -35,6 +35,14 @@
         </table>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("#tweetTable").DataTable({
+            "pagingType": "full_numbers",
+        });
+    });
+</script>
 
 </body>
 </html>
