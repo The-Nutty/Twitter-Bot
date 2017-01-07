@@ -37,8 +37,9 @@ public class TwitterBotTask implements Runnable {
 
     @Override
     public void run() {
+        logger.error("starting to run bot for" + account.getName());
         //initiate twitter instance and login
-        twitter = TwitterFactory.getSingleton();
+        twitter = new TwitterFactory().getInstance();
         twitter.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
 
         AccessToken token = new AccessToken(account.getToken(), account.getTokenSecret());
@@ -160,6 +161,7 @@ public class TwitterBotTask implements Runnable {
             action.setTweetId(tweet.getId());
             action.setTweetContents(tweet.getText());
             action.setAccount(account);
+            action.setUserNameOfTweeter(tweet.getInReplyToScreenName());
             try {
                 //check if we need to Rt
                 if (tweet.getText().toLowerCase().contains("rt") || tweet.getText().toLowerCase().contains("retweet")) {
