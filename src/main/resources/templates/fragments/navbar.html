@@ -4,18 +4,16 @@
 
 </head>
 <body>
-<div th:fragment="navbar">
-    <nav class="navbar navbar-default" role="navigation">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Twitter Bot</a>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="/users">Users</a></li>
-                    <li><a href="/tweets">Tweets</a></li>
-                </ul>
-            </div>
+<nav th:fragment="navbar" class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Twitter Bot</a>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/users">Users</a></li>
+                <li><a href="/tweets">Tweets</a></li>
+            </ul>
         </div>
-    </nav>
-</div>
+    </div>
+</nav>
 </body>
 </html>
