@@ -1,7 +1,7 @@
 [
   {
     "name" : "Tom Hazell",
-    "querys" : "sweepstake RT,RT to win,giveaway RT",
+    "query" : "sweepstake RT,RT to win,giveaway RT",
     "token" : "ENTER_YOUR_TOKEN",
     "tokenSecret" : "ENTER_YOUR_TOKEN_SECRET",
     "consumerKey" : "ENTER_YOUR_KEY",
