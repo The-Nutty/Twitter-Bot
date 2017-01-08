@@ -19,6 +19,7 @@
                 <th>Is the bot running?</th>
                 <th>Is the bot on rate limit cool down (10 mins)?</th>
                 <th>Toggle Running</th>
+                <th>Update</th>
             </tr>
             </thead>
             <tbody>
@@ -30,12 +31,16 @@
                 <td th:text="${row.onRatelimitCooldown}"></td>
                 <td><a class="btn btn-default"
                        th:href="@{/users/run/{id}(id=${row.id})}">Toggle Running</a></td>
+                <td><a class="btn btn-default" th:disabled="${row.running}"
+                       th:href="@{/users/update/{id}(id=${row.id})}">Update</a></td>
             </tr>
             </tbody>
         </table>
     </div>
-</div>
 
+    <a href="/users/create" class="btn btn-default btn-lg" style="margin-top:20px">Add User</a>
+
+</div>
 <script>
     $(document).ready(function () {
         $("#tweetTable").DataTable({
@@ -43,6 +48,5 @@
         });
     });
 </script>
-
 </body>
 </html>

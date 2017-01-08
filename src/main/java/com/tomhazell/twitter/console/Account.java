@@ -33,6 +33,9 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private List<TwitterAction> actions;
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;
