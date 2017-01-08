@@ -8,6 +8,8 @@ import twitter4j.auth.AccessToken;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COOLDOWN;
 
@@ -67,7 +69,7 @@ public class TwitterBotTask implements Runnable {
         for (String queryString : account.getQuerys().split(",")) {
             logger.error(account.getName() + " searching for " + queryString);
             //if we have been told to stop then stop
-            if (!checkIsRunning()){
+            if (!checkIsRunning()) {
                 break;
             }
 
@@ -79,7 +81,7 @@ public class TwitterBotTask implements Runnable {
             //if the sinceId != 0 (meaning we have used this account previously) then only get tweets from the last
             if (sinceId != 0) {
                 query.setSinceId(sinceId);
-            }else{
+            } else {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
                 calendar.add(Calendar.DAY_OF_YEAR, -4);
@@ -116,7 +118,7 @@ public class TwitterBotTask implements Runnable {
             account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
             account.setOnRatelimitCooldown(false);
             accountRepository.save(account);
-        }else{
+        } else {
             //wait anyway as to not exeded rate limits
             logger.error("An error occurred", e);
             sleep(TwitterBotApplication.RETWEET_TIME_OUT);
@@ -127,7 +129,7 @@ public class TwitterBotTask implements Runnable {
         for (Status tweet : tweetsToEnter) {
             logger.error("Interacting with tweet with ID " + tweet.getId());
             //if we have been told to stop then stop
-            if (!checkIsRunning()){
+            if (!checkIsRunning()) {
                 break;
             }
 
@@ -162,11 +164,22 @@ public class TwitterBotTask implements Runnable {
                     sleep(TwitterBotApplication.REPLY_TIME_OUT);
                 }
 
-                if (tweet.getText().toLowerCase().contains("follow") || tweet.getText().toLowerCase().contains("following")){
-                    twitter.friendsFollowers().createFriendship(tweet.getUser().getId());
-                    action.setHasFollowed(true);
+                if (tweet.getText().toLowerCase().contains("follow") || tweet.getText().toLowerCase().contains("following")) {
+                    Set<String> userToFollow = new HashSet<>();
+                    userToFollow.add(tweet.getUser().getScreenName());
 
-                    sleep(TwitterBotApplication.FOLLOW_TIME_OUT);
+                    //find all other users in the tweet and follow them to find situations where it says follow me and @thisGuy
+                    Matcher m = Pattern.compile("@([A-Za-z0-9_]{1,15})").matcher(tweet.getText());
+                    while (m.find()) {
+                        userToFollow.add(m.group().substring(1));
+                    }
+
+                    for (String user : userToFollow) {
+                        twitter.friendsFollowers().createFriendship(user);
+                        sleep(TwitterBotApplication.FOLLOW_TIME_OUT);
+                    }
+
+                    action.setHasFollowed(true);
                 }
 
                 twitterActionRepository.save(action);
@@ -182,6 +195,7 @@ public class TwitterBotTask implements Runnable {
 
     /**
      * Checks if the bot should still be running by checking the running field in Account
+     *
      * @return true if we should continue to run false otherwise
      */
     private boolean checkIsRunning() {
@@ -199,10 +213,11 @@ public class TwitterBotTask implements Runnable {
 
     /**
      * This multaplys the input time by 0.8 to 1.2 randomly genarated in order to not seem like a bot
+     *
      * @param time the time you want to use
      * @return the time when multiplied by this factor
      */
-    private int randomiseTime(int time){
+    private int randomiseTime(int time) {
         return (int) (time * (0.8d + ThreadLocalRandom.current().nextDouble(0.4)));
 
     }

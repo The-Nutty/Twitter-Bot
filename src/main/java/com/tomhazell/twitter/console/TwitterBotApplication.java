@@ -28,11 +28,11 @@ public class TwitterBotApplication implements CommandLineRunner {
     private ApplicationContext appContext;
 
     //all in seconds
-    public static int RETWEET_TIME_OUT = 1000 * 38;//because we can make 2400 tweets a day
-    public static int LIKE_TIME_OUT = 1000 * 5;//because we can make 180 actions every 5 mins
-    public static int REPLY_TIME_OUT = 1000 * 38;//because we can make 2400 tweets a day
-    public static int FOLLOW_TIME_OUT = 1000 * 5;//because we can make 180 actions every 5 mins
-    public static int SEARCH_TIME_OUT = 1000 * 15;//because we can make 180 actions every 5 mins
+    public static int RETWEET_TIME_OUT = 1000 * 37;//because we can make 2400 tweets a day
+    public static int LIKE_TIME_OUT = 1000 * 5;//because we can make 180 actions every 15 mins
+    public static int REPLY_TIME_OUT = 1000 * 37;//because we can make 2400 tweets a day
+    public static int FOLLOW_TIME_OUT = 1000 * 5;//because we can make 180 actions every 15 mins
+    public static int SEARCH_TIME_OUT = 1000 * 15;//because we can make 180 actions every 15 mins
     public static int RATE_LIMIT_COOLDOWN = 1000 * 60 * 10;//we can make 180 actions every 15 mins, if we hit this limit (which we should not) then wait for 10 mins
 
     //TODO gleam.io support by adding a query for all gleam links then prompting manual
