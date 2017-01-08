@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -71,7 +72,7 @@ public class TwitterBotTask implements Runnable {
             }
 
             Query query = new Query();
-            query.setQuery(queryString + " min_retweets:5 -filter:retweets");//   -vote -filter:retweets
+            query.setQuery(queryString + " min_retweets:10 -filter:retweets");//-vote -filter:retweets
             query.setResultType(account.getResultType());
             query.setCount(99);
 
