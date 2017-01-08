@@ -16,6 +16,7 @@
             <tr>
                 <th>Id</th>
                 <th>Tweet Id</th>
+                <th>Query</th>
                 <th>Original Tweet User</th>
                 <th>Bot Account</th>
                 <th>Did we reply to them?</th>
@@ -29,6 +30,7 @@
             <tr th:each="row : ${tweets}">
                 <td th:text="${row.id}"></td>
                 <td th:text="${row.tweetId}"></td>
+                <td th:text="${row.query}"></td>
                 <td th:text="${row.userNameOfTweeter}"></td>
                 <td th:text="${row.account.name}"></td>
                 <td th:text="${row.hasReplyed}"></td>

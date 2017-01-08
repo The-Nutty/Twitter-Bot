@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
@@ -66,7 +65,7 @@ public class TwitterBotTask implements Runnable {
      * then enter them
      */
     private void search() {
-        for (String queryString : account.getQuerys().split(",")) {
+        for (String queryString : account.getQuery().split(",")) {
             logger.error(account.getName() + " searching for " + queryString);
             //if we have been told to stop then stop
             if (!checkIsRunning()) {
@@ -99,7 +98,7 @@ public class TwitterBotTask implements Runnable {
             //sleep to evade rate limit
             sleep(TwitterBotApplication.SEARCH_TIME_OUT);
 
-            enter();//enter the competition's
+            enter(queryString);//enter the competition's
         }
     }
 
@@ -125,7 +124,7 @@ public class TwitterBotTask implements Runnable {
         }
     }
 
-    private void enter() {
+    private void enter(String query) {
         for (Status tweet : tweetsToEnter) {
             logger.error("Interacting with tweet with ID " + tweet.getId());
             //if we have been told to stop then stop
@@ -138,6 +137,7 @@ public class TwitterBotTask implements Runnable {
             action.setTweetContents(tweet.getText());
             action.setAccount(account);
             action.setUserNameOfTweeter(tweet.getUser().getName());
+            action.setQuery(query);
             try {
                 //check if we need to Rt
                 if (tweet.getText().toLowerCase().contains("rt") || tweet.getText().toLowerCase().contains("retweet")) {
@@ -159,8 +159,6 @@ public class TwitterBotTask implements Runnable {
                     action.setHasRetweeted(true);
 
                     sleep(TwitterBotApplication.REPLY_TIME_OUT);
-                } else {
-                    //TODO stuff
                 }
 
                 if (tweet.getText().toLowerCase().contains("follow") || tweet.getText().toLowerCase().contains("following")) {

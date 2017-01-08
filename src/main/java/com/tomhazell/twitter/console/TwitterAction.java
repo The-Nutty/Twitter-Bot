@@ -13,6 +13,7 @@ public class TwitterAction {
 
     private Long tweetId;
     private String userNameOfTweeter;
+    private String query;
 
     @ManyToOne
     private Account account;
@@ -23,6 +24,14 @@ public class TwitterAction {
     private boolean hasFollowed;
 
     private String tweetContents;
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
     public String getUserNameOfTweeter() {
         return userNameOfTweeter;

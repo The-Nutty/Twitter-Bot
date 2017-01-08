@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Class used to persist all the accounds/bots we have, stored in a DB using {@link AccountRepository}
+ * Class used to persist all the accounts/bots we have, stored in a DB using {@link AccountRepository}
  */
 @Entity
 public class Account {
@@ -16,7 +16,7 @@ public class Account {
 
     private String name;
 
-    private String querys;
+    private String query;
 
     @Enumerated(EnumType.STRING)
     private Query.ResultType resultType;
@@ -73,12 +73,12 @@ public class Account {
         this.name = name;
     }
 
-    public String getQuerys() {
-        return querys;
+    public String getQuery() {
+        return query;
     }
 
-    public void setQuerys(String querys) {
-        this.querys = querys;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     public String getToken() {
