@@ -141,10 +141,7 @@ public class TwitterBotTask implements Runnable {
             try {
                 //check if we need to Rt
                 if (tweet.getText().toLowerCase().contains("rt") || tweet.getText().toLowerCase().contains("retweet")) {
-                    twitter.retweetStatus(tweet.getId());
-                    action.setHasRetweeted(true);
-
-                    sleep(TwitterBotApplication.RETWEET_TIME_OUT);
+                    retweet(tweet, action);
                 }
 
                 //check if we need to like
@@ -156,30 +153,27 @@ public class TwitterBotTask implements Runnable {
                 }
 
                 //check if we need to reply
-                if (tweet.getText().toLowerCase().contains("reply")) {
-                    StatusUpdate reply = new StatusUpdate(tweet.getInReplyToScreenName() + " ");//TODO we should have some real body to the tweet  We may also want to set GeoLocation to make it seem more ligit
+                if (tweet.getText().toLowerCase().contains("reply") || tweet.getText().toLowerCase().contains("tag ")) {
+                    StatusUpdate reply = new StatusUpdate("@Nutty007tom @Gooseyboy1234 @hiaitsme");//TODO we should have some real body to the tweet  We may also want to set GeoLocation to make it seem more ligit
                     twitter.updateStatus(reply);
                     action.setHasRetweeted(true);
 
                     sleep(TwitterBotApplication.REPLY_TIME_OUT);
+                } else {
+                    //TODO stuff
                 }
 
                 if (tweet.getText().toLowerCase().contains("follow") || tweet.getText().toLowerCase().contains("following")) {
-                    Set<String> userToFollow = new HashSet<>();
-                    userToFollow.add(tweet.getUser().getScreenName());
+                    follow(tweet, action);
+                }
 
-                    //find all other users in the tweet and follow them to find situations where it says follow me and @thisGuy
-                    Matcher m = Pattern.compile("@([A-Za-z0-9_]{1,15})").matcher(tweet.getText());
-                    while (m.find()) {
-                        userToFollow.add(m.group().substring(1));
+                if (tweet.getText().toLowerCase().contains("RT+F") || tweet.getText().toLowerCase().contains("RT&F")) {
+                    if (!action.isHasRetweeted()) {//check that we have not already retweted
+                        retweet(tweet, action);
                     }
-
-                    for (String user : userToFollow) {
-                        twitter.friendsFollowers().createFriendship(user);
-                        sleep(TwitterBotApplication.FOLLOW_TIME_OUT);
+                    if (!action.isHasFollowed()) {//check that we have not already followed
+                        follow(tweet, action);
                     }
-
-                    action.setHasFollowed(true);
                 }
 
                 twitterActionRepository.save(action);
@@ -191,6 +185,31 @@ public class TwitterBotTask implements Runnable {
 
         //clear all of the old tweets
         tweetsToEnter.clear();
+    }
+
+    private void follow(Status tweet, TwitterAction action) throws TwitterException {
+        Set<String> userToFollow = new HashSet<>();
+        userToFollow.add(tweet.getUser().getScreenName());
+
+        //find all other users in the tweet and follow them to find situations where it says follow me and @thisGuy
+        Matcher m = Pattern.compile("@([A-Za-z0-9_]{1,15})").matcher(tweet.getText());
+        while (m.find()) {
+            userToFollow.add(m.group().substring(1));
+        }
+
+        for (String user : userToFollow) {
+            twitter.friendsFollowers().createFriendship(user);
+            sleep(TwitterBotApplication.FOLLOW_TIME_OUT);
+        }
+
+        action.setHasFollowed(true);
+    }
+
+    private void retweet(Status tweet, TwitterAction action) throws TwitterException {
+        twitter.retweetStatus(tweet.getId());
+        action.setHasRetweeted(true);
+
+        sleep(TwitterBotApplication.RETWEET_TIME_OUT);
     }
 
     /**
