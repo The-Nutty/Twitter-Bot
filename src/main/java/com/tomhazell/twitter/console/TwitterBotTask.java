@@ -187,7 +187,11 @@ public class TwitterBotTask implements Runnable {
 
     private void follow(Status tweet, TwitterAction action) throws TwitterException {
         Set<String> userToFollow = new HashSet<>();
-        userToFollow.add(tweet.getUser().getScreenName());
+        if (tweet.getRetweetedStatus() != null) {
+            userToFollow.add(tweet.getRetweetedStatus().getUser().getScreenName());
+        } else {
+            userToFollow.add(tweet.getUser().getScreenName());
+        }
 
         //find all other users in the tweet and follow them to find situations where it says follow me and @thisGuy
         Matcher m = Pattern.compile("@([A-Za-z0-9_]{1,15})").matcher(tweet.getText());
