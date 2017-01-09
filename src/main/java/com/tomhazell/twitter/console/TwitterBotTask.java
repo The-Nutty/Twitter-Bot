@@ -75,7 +75,7 @@ public class TwitterBotTask implements Runnable {
             Query query = new Query();
             query.setQuery(queryString + " min_retweets:10 -filter:retweets");//-vote -filter:retweets
             query.setResultType(account.getResultType());
-            query.setCount(99);
+            query.setCount(100);
 
             //if the sinceId != 0 (meaning we have used this account previously) then only get tweets from the last
             if (sinceId != 0) {
@@ -90,7 +90,7 @@ public class TwitterBotTask implements Runnable {
             try {
                 QueryResult search = twitter.search(query);
                 logger.error("Got " + search.getTweets().size() + " Search results");
-                tweetsToEnter.addAll(search.getTweets());
+                filterAndAddTweets(search.getTweets());
             } catch (TwitterException e) {
                 handleTwitterError(e);
             }
@@ -100,6 +100,32 @@ public class TwitterBotTask implements Runnable {
 
             enter(queryString);//enter the competition's
         }
+    }
+
+    private void filterAndAddTweets(List<Status> tweets) {
+        for (Status tweet : tweets) {
+            boolean contains = false;
+            for (String partOfName : tweet.getUser().getName().split(" ")) {
+                if (partOfName.toLowerCase().equals("bot") || partOfName.toLowerCase().equals("botfinder")){
+                    contains = true;
+                }
+
+                if (contains) {
+                    try {
+                        logger.error("User name'" + tweet.getUser().getName() + "' looks like a bot finder so blocking them");
+                        twitter.createBlock(tweet.getUser().getId());
+                    } catch (TwitterException e) {
+                        handleTwitterError(e);
+                    }
+                }else if(twitterActionRepository.findOneByAccountAndTweetId(account, tweet.getId()) != null){
+                    // in this case we have already delt with the tweet so ignore it
+                    logger.error("We have already actioned on this tweet so ignoring it.");
+                }else{
+                    tweetsToEnter.add(tweet);
+                }
+            }
+        }
+
     }
 
     private void handleTwitterError(TwitterException e) {
