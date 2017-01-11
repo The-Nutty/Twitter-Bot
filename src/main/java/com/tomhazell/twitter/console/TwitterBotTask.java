@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COOLDOWN;
 
 /**
- * Created by Tom Hazell on 06/01/2017.
+ * This is the call where all the actual botting happens.
  */
 public class TwitterBotTask implements Runnable {
 
@@ -81,10 +82,11 @@ public class TwitterBotTask implements Runnable {
             if (sinceId != 0) {
                 query.setSinceId(sinceId);
             } else {
+                //if this is the first time we are running a query then just get tweets from the last 4 days
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
                 calendar.add(Calendar.DAY_OF_YEAR, -4);
-//                query.setSince(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
+                query.setSince(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
             }
 
             try {
@@ -102,6 +104,10 @@ public class TwitterBotTask implements Runnable {
         }
     }
 
+    /**
+     * This is used to filter tweets we dont what to enter, currently we are just checking if the account looks like a bot finder and in that case exluding the tweet and blocking the user
+     * @param tweets a lsit of tweets returned from search
+     */
     private void filterAndAddTweets(List<Status> tweets) {
         for (Status tweet : tweets) {
             boolean contains = false;
@@ -113,7 +119,7 @@ public class TwitterBotTask implements Runnable {
                 if (contains) {
                     try {
                         logger.error("User name'" + tweet.getUser().getName() + "' looks like a bot finder so blocking them");
-                        twitter.createBlock(tweet.getUser().getId());
+                        twitter.createBlock(tweet.getUser().getId());//TODO i cant find if there is or is not a rate limit on this call. I assume there is and so we should sleep after this call
                     } catch (TwitterException e) {
                         handleTwitterError(e);
                     }
@@ -128,6 +134,10 @@ public class TwitterBotTask implements Runnable {
 
     }
 
+    /**
+     * This handles the errors that Twitter4j throws
+     * @param e TwitterException
+     */
     private void handleTwitterError(TwitterException e) {
         //if we are rate limited sleep for 10 mins
         if (e.exceededRateLimitation()) {
@@ -150,6 +160,10 @@ public class TwitterBotTask implements Runnable {
         }
     }
 
+    /**
+     * This will enter alll the tweets in tweetsToEnter
+     * @param query The query that was used to produce the list, so that we can store it in the TwitterAction DB
+     */
     private void enter(String query) {
         for (Status tweet : tweetsToEnter) {
             logger.error("Interacting with tweet with ID " + tweet.getId());
@@ -187,10 +201,12 @@ public class TwitterBotTask implements Runnable {
                     sleep(TwitterBotApplication.REPLY_TIME_OUT);
                 }
 
+                //check if we need to follow
                 if (tweet.getText().toLowerCase().contains("follow") || tweet.getText().toLowerCase().contains("following")) {
                     follow(tweet, action);
                 }
 
+                //common abbreviations for retweet and follow
                 if (tweet.getText().toLowerCase().contains("RT+F") || tweet.getText().toLowerCase().contains("RT&F")) {
                     if (!action.isHasRetweeted()) {//check that we have not already retweted
                         retweet(tweet, action);
@@ -211,6 +227,11 @@ public class TwitterBotTask implements Runnable {
         tweetsToEnter.clear();
     }
 
+    /**
+     * This will follow the user that sent the tweet and anybody else tagged in it
+     * @param tweet The tweet from twitter4j
+     * @param action the TwitterAction DB entery
+     */
     private void follow(Status tweet, TwitterAction action) throws TwitterException {
         Set<String> userToFollow = new HashSet<>();
         if (tweet.getRetweetedStatus() != null) {

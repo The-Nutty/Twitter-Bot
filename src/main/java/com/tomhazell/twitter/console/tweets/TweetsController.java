@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by Tom Hazell on 06/01/2017.
+ *This is the controller for all of the Tweeting related endpoints
  */
 @Controller
 public class TweetsController {
@@ -28,7 +28,7 @@ public class TweetsController {
     public static final String MODEL_ATTR_TWEETS_LIST = "tweets";
 
     @Autowired
-    TwitterActionRepository twitterActionRepository;
+    private TwitterActionRepository twitterActionRepository;
 
     @Autowired
     private ObjectMapper mapper;

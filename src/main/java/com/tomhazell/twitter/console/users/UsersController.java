@@ -19,7 +19,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.List;
 
 /**
- * Created by Tom Hazell on 06/01/2017.
+ * This is the controller for all of the account related endpoints
  */
 @Controller
 public class UsersController {
@@ -27,16 +27,21 @@ public class UsersController {
     public static final String ENDPOINT_USERS = "/users";
     public static final String ENDPOINT_INDEX = "/";
     public static final String ENDPOINT_TOGGLE_BOT = "/users/run/{id}";
+    public static final String ENDPOINT_USERS_UPDATE = "/users/update/{id}";
+    public static final String ENDPOINT_USERS_CREATE = "/users/create";
 
     public static final String VIEW_ACCOUNTS = "allAccounts";
+    public static final String VIEW_ADD_USER = "addUser";
 
     public static final String MODEL_ATTR_USERS_LIST = "users";
-    public static final String VIEW_ADD_USER = "addUser";
-    @Autowired
-    AccountRepository accountRepository;
+    public static final String MODEL_ATTR_IS_EDIT = "isEdit";
+    public static final String MODEL_ATTR_ACCOUNT = "account";
 
     @Autowired
-    TwitterActionRepository twitterActionRepository;
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private TwitterActionRepository twitterActionRepository;
 
     @RequestMapping(ENDPOINT_USERS)
     public ModelAndView getAllUsers(Model model){
@@ -60,16 +65,16 @@ public class UsersController {
         return new RedirectView(ENDPOINT_USERS);
     }
 
-    @RequestMapping("/users/create")
+    @RequestMapping(ENDPOINT_USERS_CREATE)
     public ModelAndView createUser(Account account, Model model){
-        model.addAttribute("isEdit", false);
+        model.addAttribute(MODEL_ATTR_IS_EDIT, false);
         return new ModelAndView(VIEW_ADD_USER);
     }
 
     /**
      * This endpoint is used both for saving an updated user or a new user.
      */
-    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
+    @RequestMapping(value = ENDPOINT_USERS_CREATE, method = RequestMethod.POST)
     public Object postCreateUser(Model model, Account account, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             model.addAttribute("error", bindingResult.getAllErrors().get(0).toString());
@@ -83,16 +88,16 @@ public class UsersController {
         return new RedirectView(ENDPOINT_USERS);
     }
 
-    @RequestMapping("/users/update/{id}")
+    @RequestMapping(ENDPOINT_USERS_UPDATE)
     public ModelAndView updateUser(@PathVariable("id") Long userId, Account account, Model model){
         account = accountRepository.findOne(userId);
-        model.addAttribute("account", account);
-        model.addAttribute("isEdit", true);
+        model.addAttribute(MODEL_ATTR_ACCOUNT, account);
+        model.addAttribute(MODEL_ATTR_IS_EDIT, true);
         return new ModelAndView(VIEW_ADD_USER);
     }
 
     /**
-     * temp call to redirect to the users page when a user gose to the index
+     * temp call to redirect to the users page when a user goes to the index
      */
     @RequestMapping(ENDPOINT_INDEX)
     public RedirectView homePage(){
