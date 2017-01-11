@@ -1,5 +1,9 @@
 package com.tomhazell.twitter.console;
 
+import com.tomhazell.twitter.console.tweets.TwitterAction;
+import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
+import com.tomhazell.twitter.console.users.Account;
+import com.tomhazell.twitter.console.users.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.*;

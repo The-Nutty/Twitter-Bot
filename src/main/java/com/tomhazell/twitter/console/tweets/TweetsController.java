@@ -1,8 +1,6 @@
 package com.tomhazell.twitter.console.tweets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tomhazell.twitter.console.TwitterAction;
-import com.tomhazell.twitter.console.TwitterActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +9,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.List;
 
 /**

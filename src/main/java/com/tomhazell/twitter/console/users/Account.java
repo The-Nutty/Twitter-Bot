@@ -1,5 +1,6 @@
-package com.tomhazell.twitter.console;
+package com.tomhazell.twitter.console.users;
 
+import com.tomhazell.twitter.console.tweets.TwitterAction;
 import twitter4j.Query;
 
 import javax.persistence.*;

@@ -1,8 +1,6 @@
 package com.tomhazell.twitter.console.users;
 
-import com.tomhazell.twitter.console.Account;
-import com.tomhazell.twitter.console.AccountRepository;
-import com.tomhazell.twitter.console.TwitterActionRepository;
+import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import com.tomhazell.twitter.console.TwitterBotTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;

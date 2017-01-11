@@ -1,4 +1,4 @@
-package com.tomhazell.twitter.console;
+package com.tomhazell.twitter.console.users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
