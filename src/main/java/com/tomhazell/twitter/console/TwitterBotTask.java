@@ -177,6 +177,6 @@ public class TwitterBotTask implements Runnable {
      */
     private boolean checkIsRunning() {
         account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
-        return account.isRunningStream();
+        return account.isRunningTraditional();
     }
 }
