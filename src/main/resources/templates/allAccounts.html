@@ -5,8 +5,12 @@
 <div class="container">
 
     <nav th:replace="fragments/navbar :: navbar"></nav>
-    <div class="page-header">
+    <div class="jumbotron">
         <h1>All Users</h1>
+        <p>This is where you can manage your users or add more. You can use the update button to update the auth token
+            or querys.
+            I recommend you run in Stream mode (my clicking Toggle Ruuning Modes -> Streams), this uses twitters stream API
+            meaning much more tweets will be returned with no rate limit.</p>
     </div>
 
     <div class="table-responsive">
@@ -32,14 +36,18 @@
                 <td th:text="${row.runningStream}"></td>
                 <td th:text="${row.onRatelimitCooldown}"></td>
                 <td>
-                    <a class="btn btn-default"
-                       th:href="@{/users/run/{id}/og(id=${row.id})}" th:disabled="${row.runningStream}">Toggle Running
-                        Traditional</a>
-                    <a class="btn btn-default"
-                       th:href="@{/users/run/{id}/stream(id=${row.id})}" th:disabled="${row.runningTraditional}">Toggle
-                        Running Stream</a>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Toggle Running
+                            Modes
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a th:href="@{/users/run/{id}/og(id=${row.id})}" th:disabled="${row.runningStream}">
+                                Traditional</a></li>
+                            <li><a th:href="@{/users/run/{id}/stream(id=${row.id})}"
+                                   th:disabled="${row.runningTraditional}">Streams</a></li>
+                        </ul>
+                    </div>
                 </td>
-
 
                 <td><a class="btn btn-default" th:disabled="${row.runningTraditional || row.runningStream}"
                        th:href="@{/users/update/{id}(id=${row.id})}">Update</a></td>
