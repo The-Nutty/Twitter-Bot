@@ -110,41 +110,44 @@ public class TwitterBotTask implements Runnable {
 
     /**
      * This is used to filter tweets we dont what to enter, currently we are just checking if the account looks like a bot finder and in that case exluding the tweet and blocking the user
+     *
      * @param tweets a lsit of tweets returned from search
      */
     private void filterAndAddTweets(List<Status> tweets) {
         for (Status tweet : tweets) {
             boolean contains = false;
             for (String partOfName : tweet.getUser().getName().split(" ")) {
-                if (partOfName.toLowerCase().equals("bot") || partOfName.toLowerCase().equals("botfinder")){
+                if (partOfName.toLowerCase().equals("bot") || partOfName.toLowerCase().equals("botfinder")) {
                     contains = true;
                 }
+            }
 
-                if (contains) {
-                    try {
-                        logger.error("User name'" + tweet.getUser().getName() + "' looks like a bot finder so blocking them");
-                        twitter.createBlock(tweet.getUser().getId());//TODO i cant find if there is or is not a rate limit on this call. I assume there is and so we should sleep after this call
-                    } catch (TwitterException e) {
-                        TwitterBotUtils.handleTwitterError(e, account, accountRepository);
-                    }
-                }else if(twitterActionRepository.findOneByAccountAndTweetId(account, tweet.getId()) != null){
-                    // in this case we have already delt with the tweet so ignore it
-                    logger.error("We have already actioned on this tweet so ignoring it.");
-                }else{
+            if (contains) {
+                try {
+                    logger.error("User name'" + tweet.getUser().getName() + "' looks like a bot finder so blocking them");
+                    twitter.createBlock(tweet.getUser().getId());//TODO i cant find if there is or is not a rate limit on this call. I assume there is and so we should sleep after this call
+                } catch (TwitterException e) {
+                    TwitterBotUtils.handleTwitterError(e, account, accountRepository);
+                }
+            } else if (twitterActionRepository.findOneByAccountAndTweetId(account, tweet.getId()) != null) {
+                // in this case we have already delt with the tweet so ignore it
+                logger.error("We have already actioned on this tweet so ignoring it.");
+            } else {
 
-                    if (tweet.getRetweetedStatus() != null) {
-                        tweetsToEnter.add(tweet.getRetweetedStatus());
-                    }else{
-                        tweetsToEnter.add(tweet);
-                    }
+                if (tweet.getRetweetedStatus() != null) {
+                    tweetsToEnter.add(tweet.getRetweetedStatus());
+                } else {
+                    tweetsToEnter.add(tweet);
                 }
             }
+
         }
 
     }
 
     /**
      * This will enter alll the tweets in tweetsToEnter
+     *
      * @param query The query that was used to produce the list, so that we can store it in the TwitterAction DB
      */
     private void enter(String query) {
