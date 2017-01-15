@@ -28,7 +28,8 @@ public class Account {
     private String consumerKey;
     private String consumerSecret;
 
-    private boolean running;
+    private boolean runningTraditional;
+    private boolean runningStream;
     private boolean onRatelimitCooldown;
 
     @OneToMany(mappedBy = "account")
@@ -58,12 +59,20 @@ public class Account {
         this.resultType = resultType;
     }
 
-    public boolean isRunning() {
-        return running;
+    public boolean isRunningTraditional() {
+        return runningTraditional;
     }
 
-    public void setRunning(boolean running) {
-        this.running = running;
+    public void setRunningTraditional(boolean runningTraditional) {
+        this.runningTraditional = runningTraditional;
+    }
+
+    public boolean isRunningStream() {
+        return runningStream;
+    }
+
+    public void setRunningStream(boolean runningStream) {
+        this.runningStream = runningStream;
     }
 
     public String getName() {
