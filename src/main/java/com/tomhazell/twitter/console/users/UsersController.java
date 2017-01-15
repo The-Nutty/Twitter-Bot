@@ -1,5 +1,6 @@
 package com.tomhazell.twitter.console.users;
 
+import com.tomhazell.twitter.console.TwitterBotStreamTask;
 import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import com.tomhazell.twitter.console.TwitterBotTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class UsersController {
     private TwitterActionRepository twitterActionRepository;
 
     @RequestMapping(ENDPOINT_USERS)
-    public ModelAndView getAllUsers(Model model){
+    public ModelAndView getAllUsers(Model model) {
         List<Account> all = accountRepository.findAll();
 
         model.addAttribute(MODEL_ATTR_USERS_LIST, all);
@@ -50,21 +51,23 @@ public class UsersController {
     }
 
     @RequestMapping(ENDPOINT_TOGGLE_BOT)
-    public RedirectView runUser(@PathVariable("id") Long userId){
+    public RedirectView runUser(@PathVariable("id") Long userId) {
         Account account = accountRepository.findOne(userId);
         if (account.isRunning()) {
             account.setRunning(false);
-        }else{
+        } else {
             account.setRunning(true);
             TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-            taskExecutor.execute(new TwitterBotTask(twitterActionRepository, accountRepository, account));
+//            taskExecutor.execute(new TwitterBotTask(twitterActionRepository, accountRepository, account));
+            taskExecutor.execute(new TwitterBotStreamTask(twitterActionRepository, accountRepository, account));
+
         }
         accountRepository.save(account);
         return new RedirectView(ENDPOINT_USERS);
     }
 
     @RequestMapping(ENDPOINT_USERS_CREATE)
-    public ModelAndView createUser(Account account, Model model){
+    public ModelAndView createUser(Account account, Model model) {
         model.addAttribute(MODEL_ATTR_IS_EDIT, false);
         return new ModelAndView(VIEW_ADD_USER);
     }
@@ -73,8 +76,8 @@ public class UsersController {
      * This endpoint is used both for saving an updated user or a new user.
      */
     @RequestMapping(value = ENDPOINT_USERS_CREATE, method = RequestMethod.POST)
-    public Object postCreateUser(Model model, Account account, BindingResult bindingResult){
-        if (bindingResult.hasErrors()){
+    public Object postCreateUser(Model model, Account account, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().get(0).toString());
             return new ModelAndView(VIEW_ADD_USER);//TODO show error
         }
@@ -87,7 +90,7 @@ public class UsersController {
     }
 
     @RequestMapping(ENDPOINT_USERS_UPDATE)
-    public ModelAndView updateUser(@PathVariable("id") Long userId, Account account, Model model){
+    public ModelAndView updateUser(@PathVariable("id") Long userId, Account account, Model model) {
         account = accountRepository.findOne(userId);
         model.addAttribute(MODEL_ATTR_ACCOUNT, account);
         model.addAttribute(MODEL_ATTR_IS_EDIT, true);
@@ -98,7 +101,7 @@ public class UsersController {
      * temp call to redirect to the users page when a user goes to the index
      */
     @RequestMapping(ENDPOINT_INDEX)
-    public RedirectView homePage(){
+    public RedirectView homePage() {
         return new RedirectView(ENDPOINT_USERS);
     }
 }
