@@ -78,7 +78,7 @@ public class TwitterBotTask implements Runnable {
             }
 
             Query query = new Query();
-            query.setQuery(queryString + " min_retweets:10 -filter:retweets");//-vote -filter:retweets
+            query.setQuery(queryString + " min_retweets:10 -filter:retweets");
             query.setResultType(account.getResultType());
             query.setCount(100);
 
