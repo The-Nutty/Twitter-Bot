@@ -1,8 +1,8 @@
 package com.tomhazell.twitter.console.users;
 
 import com.tomhazell.twitter.console.TwitterBotStreamTask;
-import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import com.tomhazell.twitter.console.TwitterBotTask;
+import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -25,7 +25,8 @@ public class UsersController {
 
     public static final String ENDPOINT_USERS = "/users";
     public static final String ENDPOINT_INDEX = "/";
-    public static final String ENDPOINT_TOGGLE_BOT = "/users/run/{id}";
+    public static final String ENDPOINT_TOGGLE_BOT_TRADITIONAL = "/users/run/{id}/og";
+    public static final String ENDPOINT_TOGGLE_BOT_STREAM = "/users/run/{id}/stream";
     public static final String ENDPOINT_USERS_UPDATE = "/users/update/{id}";
     public static final String ENDPOINT_USERS_CREATE = "/users/create";
 
@@ -50,17 +51,29 @@ public class UsersController {
         return new ModelAndView(VIEW_ACCOUNTS);
     }
 
-    @RequestMapping(ENDPOINT_TOGGLE_BOT)
-    public RedirectView runUser(@PathVariable("id") Long userId) {
+    @RequestMapping(ENDPOINT_TOGGLE_BOT_TRADITIONAL)
+    public RedirectView runTraditionalUser(@PathVariable("id") Long userId) {
         Account account = accountRepository.findOne(userId);
-        if (account.isRunning()) {
-            account.setRunning(false);
+        if (account.isRunningTraditional()) {
+            account.setRunningTraditional(false);
         } else {
-            account.setRunning(true);
+            account.setRunningTraditional(true);
             TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-//            taskExecutor.execute(new TwitterBotTask(twitterActionRepository, accountRepository, account));
-            taskExecutor.execute(new TwitterBotStreamTask(twitterActionRepository, accountRepository, account));
+            taskExecutor.execute(new TwitterBotTask(twitterActionRepository, accountRepository, account));
+        }
+        accountRepository.save(account);
+        return new RedirectView(ENDPOINT_USERS);
+    }
 
+    @RequestMapping(ENDPOINT_TOGGLE_BOT_STREAM)
+    public RedirectView runStreamUser(@PathVariable("id") Long userId) {
+        Account account = accountRepository.findOne(userId);
+        if (account.isRunningStream()) {
+            account.setRunningStream(false);
+        } else {
+            account.setRunningStream(true);
+            TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+            taskExecutor.execute(new TwitterBotStreamTask(twitterActionRepository, accountRepository, account));
         }
         accountRepository.save(account);
         return new RedirectView(ENDPOINT_USERS);

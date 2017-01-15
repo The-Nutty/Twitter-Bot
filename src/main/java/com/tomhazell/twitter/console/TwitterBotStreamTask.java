@@ -49,10 +49,11 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         twitterStream.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
         twitterStream.setOAuthAccessToken(new AccessToken(account.getToken(), account.getTokenSecret()));
         twitterStream.addListener(this);
+
         FilterQuery query = new FilterQuery(account.getQuery().split(","));
         twitterStream.filter(query);
 
-        while(accountRepository.findOne(account.getId()).isRunning()){//TODO we may want to do this less regular
+        while((account = accountRepository.findOne(account.getId())).isRunningStream()){//TODO we may want to do this less regularly?
             if (queue.size() > 0){
                 Status last = queue.getLast();
                 queue.removeLast();
@@ -68,13 +69,39 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
             }
         }
 
+        //clean up stream
+        twitterStream.clearListeners();
+        twitterStream.cleanUp();
+
+        //update info that we are not running
+        account = accountRepository.findOne(account.getId());
+        account.setRunningStream(false);
+        accountRepository.save(account);
     }
 
     //all the methods from the stream lisener
+
+    /**
+     * Here we are going to filter all tweets we get and add them to the queue
+     * @param status the tweet in from the stream
+     */
     @Override
     public void onStatus(Status status) {
-        logger.info("got status");
-        queue.add(status);
+
+        //get original tweet if its a retweet
+        if (status.getRetweetedStatus() != null) {
+            status = status.getRetweetedStatus();
+        }
+
+        //since we are now getting loads of tweets we should make sure that the queue dose not get to long and be more picky/filter TODO
+
+        //check if we have actioned on this tweet already
+        if (twitterActionRepository.findOneByAccountAndTweetId(account, status.getId()) == null){
+            logger.info("got status");
+            queue.add(status);
+        }else{
+            logger.info("got status we have already used");
+        }
     }
 
     @Override

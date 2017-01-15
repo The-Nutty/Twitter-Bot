@@ -131,7 +131,12 @@ public class TwitterBotTask implements Runnable {
                     // in this case we have already delt with the tweet so ignore it
                     logger.error("We have already actioned on this tweet so ignoring it.");
                 }else{
-                    tweetsToEnter.add(tweet);
+
+                    if (tweet.getRetweetedStatus() != null) {
+                        tweetsToEnter.add(tweet.getRetweetedStatus());
+                    }else{
+                        tweetsToEnter.add(tweet);
+                    }
                 }
             }
         }
@@ -169,6 +174,6 @@ public class TwitterBotTask implements Runnable {
      */
     private boolean checkIsRunning() {
         account = accountRepository.findOne(account.getId());//make sure we have the most up to date version
-        return account.isRunning();
+        return account.isRunningStream();
     }
 }

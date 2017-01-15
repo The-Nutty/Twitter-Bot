@@ -16,7 +16,8 @@
                 <th>Users Name</th>
                 <th>Querys</th>
                 <th>Result Type</th>
-                <th>Is the bot running?</th>
+                <th>Is the bot running in traditional mode?</th>
+                <th>Is the bot running is stream mode?</th>
                 <th>Is the bot on rate limit cool down (10 mins)?</th>
                 <th>Toggle Running</th>
                 <th>Update</th>
@@ -27,11 +28,20 @@
                 <td th:text="${row.name}"></td>
                 <td th:text="${row.query}"></td>
                 <td th:text="${row.resultType}"></td>
-                <td th:text="${row.running}"></td>
+                <td th:text="${row.runningTraditional}"></td>
+                <td th:text="${row.runningStream}"></td>
                 <td th:text="${row.onRatelimitCooldown}"></td>
-                <td><a class="btn btn-default"
-                       th:href="@{/users/run/{id}(id=${row.id})}">Toggle Running</a></td>
-                <td><a class="btn btn-default" th:disabled="${row.running}"
+                <td>
+                    <a class="btn btn-default"
+                       th:href="@{/users/run/{id}/og(id=${row.id})}" th:disabled="${row.runningStream}">Toggle Running
+                        Traditional</a>
+                    <a class="btn btn-default"
+                       th:href="@{/users/run/{id}/stream(id=${row.id})}" th:disabled="${row.runningTraditional}">Toggle
+                        Running Stream</a>
+                </td>
+
+
+                <td><a class="btn btn-default" th:disabled="${row.runningTraditional || row.runningStream}"
                        th:href="@{/users/update/{id}(id=${row.id})}">Update</a></td>
             </tr>
             </tbody>
