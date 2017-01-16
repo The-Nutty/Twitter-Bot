@@ -116,7 +116,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
         //i think there is a beater solution to this but implement a max queue length for the mean time as we get tweets way more than we can action on them
         if (queue.size() > 40){
-            logger.info("Not adding tweet to queue as we already have 40 things in it");
+            logger.info("Not adding tweet to queue as we already have 40 things in it");//try un regesteing the lisener
             return;
         }
 
