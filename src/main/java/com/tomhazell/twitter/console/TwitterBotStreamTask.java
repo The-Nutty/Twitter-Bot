@@ -111,8 +111,8 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
         //since we are now getting loads of tweets we should make sure that the queue dose not get to long and be more picky/filter TODO
         for (String filter : account.getStreamFilters().split(",")) {
-            if (status.getText().contains(filter)){
-                logger.info("Not adding tweet as it contains filted word: " + filter);
+            if (status.getText().toLowerCase().contains(filter.toLowerCase())){
+                logger.info("Not adding tweet as it contains filtered word: " + filter);
                 return;
             }
         }
