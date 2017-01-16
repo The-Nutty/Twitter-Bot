@@ -41,10 +41,10 @@
                             Modes
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                            <li><a th:href="@{/users/run/{id}/og(id=${row.id})}" th:disabled="${row.runningStream}">
+                            <li><a th:href="@{/users/run/{id}/og(id=${row.id})}" th:classappend="${row.runningStream} ? disabled : active">
                                 Traditional</a></li>
                             <li><a th:href="@{/users/run/{id}/stream(id=${row.id})}"
-                                   th:disabled="${row.runningTraditional}">Streams</a></li>
+                                   th:classappend="${row.runningTraditional} ? disabled : active">Streams</a></li>
                         </ul>
                     </div>
                 </td>

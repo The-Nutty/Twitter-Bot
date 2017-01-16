@@ -28,6 +28,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
     private Twitter twitter;
 
     private LinkedList<Status> queue = new LinkedList<>();
+    private boolean isQueueFull = false;//we try to keep the queue size between 20 and 40 in size so we unregester the lisener to not spam the logs
 
 
     public TwitterBotStreamTask(TwitterActionRepository repository, AccountRepository accountRepository, Account account) {
@@ -55,19 +56,23 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         twitterStream.filter(query);
 
         //iterate through the queue while we should be running. and Action on each tweet
-        while((account = accountRepository.findOne(account.getId())).isRunningStream()){//TODO we may want to do this less regularly?
-            if (queue.size() > 0){
+        while ((account = accountRepository.findOne(account.getId())).isRunningStream()) {//TODO we may want to do this less regularly?
+            if (queue.size() > 0) {
                 Status last = queue.getLast();
                 queue.removeLast();
 
-                logger.info("Interacting with tweet with ID " + last.getId());
+                if (queue.size() < 20 && isQueueFull){
+                    logger.info("queue size is smaller than 20 so re adding listener");
+                    twitterStream.addListener(this);
+                }
+
+                    logger.info("Interacting with tweet with ID " + last.getId());
 
                 try {
                     twitterActionRepository.save(TwitterBotUtils.interactWithTweet(twitter, last, account, "Stream:" + account.getQuery()));
                 } catch (TwitterException e) {
                     TwitterBotUtils.handleTwitterError(e, account, accountRepository);
                 }
-
             }
         }
 
@@ -80,6 +85,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
     /**
      * Here we are going to filter all tweets we get and add them to the queue
+     *
      * @param status the tweet in from the stream
      */
     @Override
@@ -111,7 +117,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
         //since we are now getting loads of tweets we should make sure that the queue dose not get to long and be more picky/filter TODO
         for (String filter : account.getStreamFilters().split(",")) {
-            if (status.getText().toLowerCase().contains(filter.toLowerCase())){
+            if (status.getText().toLowerCase().contains(filter.toLowerCase())) {
                 logger.info("Not adding tweet as it contains filtered word: " + filter);
                 return;
             }
@@ -119,16 +125,18 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
 
         //i think there is a beater solution to this but implement a max queue length for the mean time as we get tweets way more than we can action on them
-        if (queue.size() > 40){
-            logger.info("Not adding tweet to queue as we already have 40 things in it");//try un regesteing the lisener
+        if (queue.size() > 40) {
+            logger.info("Not adding tweet to queue as we already have 40 things in it, removing lisener");//try un regesteing the lisener
+            twitterStream.removeListener(this);
+            isQueueFull = true;
             return;
         }
 
         //check if we have actioned on this tweet already
-        if (twitterActionRepository.findOneByAccountAndTweetId(account, status.getId()) == null){
+        if (twitterActionRepository.findOneByAccountAndTweetId(account, status.getId()) == null) {
             logger.info("got status");
             queue.add(status);
-        }else{
+        } else {
             logger.info("got status we have already used");
         }
     }
