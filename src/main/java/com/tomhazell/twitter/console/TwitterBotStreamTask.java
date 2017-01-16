@@ -64,6 +64,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
                 if (queue.size() < 20 && isQueueFull){
                     logger.info("queue size is smaller than 20 so re adding listener");
                     twitterStream.addListener(this);
+                    isQueueFull = false;
                 }
 
                     logger.info("Interacting with tweet with ID " + last.getId());
