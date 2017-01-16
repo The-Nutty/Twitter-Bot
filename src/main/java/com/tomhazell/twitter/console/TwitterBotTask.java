@@ -117,6 +117,15 @@ public class TwitterBotTask implements Runnable {
      */
     private void filterAndAddTweets(List<Status> tweets) {
         for (Status tweet : tweets) {
+            //get original tweet if its a retweet
+            if (tweet.getRetweetedStatus() != null) {
+                tweet = tweet.getRetweetedStatus();
+            }
+            //get if a tweet is quoted the the tweet that is quoted
+            if (tweet.getQuotedStatus() != null) {
+                tweet = tweet.getQuotedStatus();
+            }
+
             boolean contains = false;
             for (String partOfName : tweet.getUser().getName().split(" ")) {
                 if (partOfName.toLowerCase().equals("bot") || partOfName.toLowerCase().equals("botfinder")) {
@@ -142,9 +151,7 @@ public class TwitterBotTask implements Runnable {
                     tweetsToEnter.add(tweet);
                 }
             }
-
         }
-
     }
 
     /**

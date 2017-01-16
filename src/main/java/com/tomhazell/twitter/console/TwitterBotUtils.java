@@ -59,7 +59,7 @@ public class TwitterBotUtils {
         }
 
         //common abbreviations for retweet and follow
-        if (tweet.getText().toLowerCase().contains("RT+F") || tweet.getText().toLowerCase().contains("RT&F")) {
+        if (tweet.getText().toLowerCase().contains("RT+F") || tweet.getText().toLowerCase().contains("F+RT") || tweet.getText().toLowerCase().contains("RT&F") || tweet.getText().toLowerCase().contains("F&RT")) {
             if (!action.isHasRetweeted()) {//check that we have not already retweted
                 retweet(tweet, action, twitter);
             }

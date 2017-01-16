@@ -96,7 +96,10 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         if (status.getRetweetedStatus() != null) {
             status = status.getRetweetedStatus();
         }
-
+        //get if a tweet is quoted the the tweet that is quoted
+        if (status.getQuotedStatus() != null) {
+            status = status.getQuotedStatus();
+        }
         //check if name of account looks like a bot finder
         boolean contains = false;
         for (String partOfName : status.getUser().getName().split(" ")) {
