@@ -1,11 +1,13 @@
+
 [
   {
-    "name" : "Tom Hazell",
+    "name" : "Name",
     "query" : "sweepstake RT,RT to win,giveaway RT",
     "token" : "ENTER_YOUR_TOKEN",
     "tokenSecret" : "ENTER_YOUR_TOKEN_SECRET",
     "consumerKey" : "ENTER_YOUR_KEY",
     "consumerSecret" : "ENTER_YOUR_KEY_SECRET",
-    "resultType" : "recent"
+    "resultType" : "recent",
+    "streamFilters" : "1,2"
   }
 ]

@@ -18,6 +18,7 @@ public class Account {
     private String name;
 
     private String query;
+    private String streamFilters;//when using stream bot this is keywords that it will filter out
 
     @Enumerated(EnumType.STRING)
     private Query.ResultType resultType;
@@ -121,5 +122,13 @@ public class Account {
 
     public void setConsumerSecret(String consumerSecret) {
         this.consumerSecret = consumerSecret;
+    }
+
+    public String getStreamFilters() {
+        return streamFilters;
+    }
+
+    public void setStreamFilters(String streamFilters) {
+        this.streamFilters = streamFilters;
     }
 }

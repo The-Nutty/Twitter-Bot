@@ -110,6 +110,13 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         }
 
         //since we are now getting loads of tweets we should make sure that the queue dose not get to long and be more picky/filter TODO
+        for (String filter : account.getStreamFilters().split(",")) {
+            if (status.getText().contains(filter)){
+                logger.info("Not adding tweet as it contains filted word: " + filter);
+                return;
+            }
+        }
+
 
         //i think there is a beater solution to this but implement a max queue length for the mean time as we get tweets way more than we can action on them
         if (queue.size() > 40){
