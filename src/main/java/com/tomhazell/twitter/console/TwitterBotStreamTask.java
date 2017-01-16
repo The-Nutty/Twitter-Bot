@@ -100,6 +100,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
                 contains = true;
             }
         }
+
         //if they look like bot finder then block them
         if (contains) {
             try {
@@ -112,6 +113,12 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         }
 
         //since we are now getting loads of tweets we should make sure that the queue dose not get to long and be more picky/filter TODO
+
+        //i think there is a beater solution to this but implement a max queue length for the mean time as we get tweets way more than we can action on them
+        if (queue.size() > 40){
+            logger.info("Not adding tweet to queue as we already have 40 things in it");
+            return;
+        }
 
         //check if we have actioned on this tweet already
         if (twitterActionRepository.findOneByAccountAndTweetId(account, status.getId()) == null){
