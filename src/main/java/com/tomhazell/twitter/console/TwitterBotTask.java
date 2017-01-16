@@ -22,6 +22,8 @@ import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COO
  */
 public class TwitterBotTask implements Runnable {
 
+    public static final String MIN_RETWEETS = "10";
+    public static final String FILTERS = " min_retweets:" + MIN_RETWEETS + " -filter:retweets";
     private Logger logger;
 
     private TwitterActionRepository twitterActionRepository;
@@ -78,7 +80,7 @@ public class TwitterBotTask implements Runnable {
             }
 
             Query query = new Query();
-            query.setQuery(queryString + " min_retweets:10 -filter:retweets");
+            query.setQuery(queryString + FILTERS);
             query.setResultType(account.getResultType());
             query.setCount(100);
 

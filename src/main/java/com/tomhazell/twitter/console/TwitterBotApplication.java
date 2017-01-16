@@ -41,7 +41,7 @@ public class TwitterBotApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        //create the default accounts as specifyed in default-users.json
+        //create the default accounts as specified in default-users.json
 
         String usersJson = readResourceFile("classpath:default-users.json");
 

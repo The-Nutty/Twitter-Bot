@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COOLDOWN;
 
 /**
- * Created by Tom Hazell on 15/01/2017.
+ * This is a class that contains the shared methods between the TwitterBotTasks.
  */
 public class TwitterBotUtils {
 
@@ -45,8 +45,8 @@ public class TwitterBotUtils {
         }
 
         //check if we need to reply
-        if (tweet.getText().toLowerCase().contains("reply") || tweet.getText().toLowerCase().contains("tag ")) {
-            StatusUpdate reply = new StatusUpdate("@Nutty007tom @Gooseyboy1234 @hiaitsme");//TODO we should have some real body to the tweet  We may also want to set GeoLocation to make it seem more ligit
+        if (tweet.getText().toLowerCase().contains("reply") || tweet.getText().toLowerCase().contains("tag ") || tweet.getText().toLowerCase().contains("comment")) {
+            StatusUpdate reply = new StatusUpdate("@Nutty007tom @Gooseyboy1234 @hiaitsme");//TODO we should have some real body to the tweet We may also want to set GeoLocation to make it seem more ligit
             twitter.updateStatus(reply);
             action.setHasRetweeted(true);
 

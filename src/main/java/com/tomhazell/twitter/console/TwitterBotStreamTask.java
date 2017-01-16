@@ -12,11 +12,13 @@ import twitter4j.util.function.Consumer;
 import java.util.LinkedList;
 
 /**
- * Created by Tom Hazell on 15/01/2017.
+ * This is a reimplementation of the TwitterBot {@link TwitterBotTask} but this is using the streams API, meaning we get much better results.
+ * It stores in tweets in a queue, tweets will only be added to it if the queue is under 40 in size and meets some criteria.
+ * Becuase we get LOTS of tweets in we can afford to filter them heavily
  */
 public class TwitterBotStreamTask implements Runnable, StatusListener {
 
-    private Logger logger;
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private TwitterActionRepository twitterActionRepository;
     private AccountRepository accountRepository;
@@ -32,7 +34,6 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         this.account = account;
         this.twitterActionRepository = repository;
         this.accountRepository = accountRepository;
-        logger = LoggerFactory.getLogger(getClass());
     }
 
 
@@ -53,6 +54,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         FilterQuery query = new FilterQuery(account.getQuery().split(","));
         twitterStream.filter(query);
 
+        //iterate through the queue while we should be running. and Action on each tweet
         while((account = accountRepository.findOne(account.getId())).isRunningStream()){//TODO we may want to do this less regularly?
             if (queue.size() > 0){
                 Status last = queue.getLast();
@@ -72,11 +74,6 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         //clean up stream
         twitterStream.clearListeners();
         twitterStream.cleanUp();
-
-        //update info that we are not running
-        account = accountRepository.findOne(account.getId());
-        account.setRunningStream(false);
-        accountRepository.save(account);
     }
 
     //all the methods from the stream lisener
