@@ -48,7 +48,7 @@ public class TwitterBotUtils {
         if (tweet.getText().toLowerCase().contains("reply") || tweet.getText().toLowerCase().contains("tag ") || tweet.getText().toLowerCase().contains("comment")) {
             StatusUpdate reply = new StatusUpdate("@Nutty007tom @Gooseyboy1234 @hiaitsme");//TODO we should have some real body to the tweet We may also want to set GeoLocation to make it seem more ligit
             twitter.updateStatus(reply);
-            action.setHasRetweeted(true);
+            action.setHasReplyed(true);
 
             sleep(TwitterBotApplication.REPLY_TIME_OUT);
         }
