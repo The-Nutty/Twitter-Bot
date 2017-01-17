@@ -23,10 +23,17 @@
         </div>
 
         <div class="form-group">
-            <label>Querys*</label>
+            <label>Query's* (Search query's separated by commas)</label>
             <input class="form-control" type="text"
                    placeholder="Query1,Query2"
                    th:field="*{query}" required="required" maxlength="255"/>
+        </div>
+
+        <div class="form-group">
+            <label>Stream Filters* (words that will be filtered out when using streams mode, separated by commas)</label>
+            <input class="form-control" type="text"
+                   placeholder="Filter 1,Filter 2"
+                   th:field="*{streamFilters}" required="required" maxlength="255"/>
         </div>
 
         <div class="form-group">

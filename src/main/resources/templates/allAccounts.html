@@ -19,6 +19,7 @@
             <tr>
                 <th>Users Name</th>
                 <th>Querys</th>
+                <th>Stream Filters</th>
                 <th>Result Type</th>
                 <th>Is the bot running in traditional mode?</th>
                 <th>Is the bot running is stream mode?</th>
@@ -31,6 +32,7 @@
             <tr th:each="row : ${users}">
                 <td th:text="${row.name}"></td>
                 <td th:text="${row.query}"></td>
+                <td th:text="${row.streamFilters}"></td>
                 <td th:text="${row.resultType}"></td>
                 <td th:text="${row.runningTraditional}"></td>
                 <td th:text="${row.runningStream}"></td>
