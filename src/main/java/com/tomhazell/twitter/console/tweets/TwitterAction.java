@@ -3,6 +3,7 @@ package com.tomhazell.twitter.console.tweets;
 import com.tomhazell.twitter.console.users.Account;
 
 import javax.persistence.*;
+import java.util.Calendar;
 
 /**
  * Class used to persist all the competitions we have entered, stored in a DB using {@link TwitterActionRepository}
@@ -12,6 +13,9 @@ public class TwitterAction {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
+
+    @Column(name="CREATION_TS", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable=false, updatable=false)
+    private Calendar dateCreated;
 
     private Long tweetId;
     private String userNameOfTweeter;
@@ -26,6 +30,14 @@ public class TwitterAction {
     private boolean hasFollowed;
 
     private String tweetContents;
+
+    public Calendar getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Calendar dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
     public String getQuery() {
         return query;

@@ -1,5 +1,5 @@
 # Twitter-Bot
-This is a twitter bot i wrote to enter competitions.
+This is a twitter bot to enter competitions.
 
 ##How
 First fill out the json in default-users.json with your query's, filters and auth tokens (auth tokens from https://apps.twitter.com/), this can also be done in the web UI also
