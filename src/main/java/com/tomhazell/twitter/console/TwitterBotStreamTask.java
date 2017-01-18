@@ -1,5 +1,6 @@
 package com.tomhazell.twitter.console;
 
+import com.tomhazell.twitter.console.tweets.TwitterAction;
 import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import com.tomhazell.twitter.console.users.Account;
 import com.tomhazell.twitter.console.users.AccountRepository;
@@ -29,6 +30,8 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
     private LinkedList<Status> queue = new LinkedList<>();
     private boolean isQueueFull = false;//we try to keep the queue size between 20 and 40 in size so we unregester the lisener to not spam the logs
+    private int followingCount;
+    private User twitterUser;
 
 
     public TwitterBotStreamTask(TwitterActionRepository repository, AccountRepository accountRepository, Account account) {
@@ -52,6 +55,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         twitterStream.setOAuthAccessToken(new AccessToken(account.getToken(), account.getTokenSecret()));
         twitterStream.addListener(this);
 
+//        start streams api
         FilterQuery query = new FilterQuery(account.getQuery().split(","));
         twitterStream.filter(query);
 

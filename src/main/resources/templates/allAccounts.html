@@ -9,7 +9,8 @@
         <h1>All Users</h1>
         <p>This is where you can manage your users or add more. You can use the update button to update the auth token
             or querys.
-            I recommend you run in Stream mode (my clicking Toggle Ruuning Modes -> Streams), this uses twitters stream API
+            I recommend you run in Stream mode (my clicking Toggle Ruuning Modes -> Streams), this uses twitters stream
+            API
             meaning much more tweets will be returned with no rate limit.</p>
     </div>
 
@@ -39,14 +40,16 @@
                 <td th:text="${row.onRatelimitCooldown}"></td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Toggle Running
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Toggle
+                            Running
                             Modes
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                            <li><a th:href="@{/users/run/{id}/og(id=${row.id})}" th:classappend="${row.runningStream} ? disabled : active">
-                                Traditional</a></li>
-                            <li><a th:href="@{/users/run/{id}/stream(id=${row.id})}"
-                                   th:classappend="${row.runningTraditional} ? disabled : active">Streams</a></li>
+                            <li th:classappend="${row.runningStream} ? 'disabled' : ''"><a
+                                    th:href="@{/users/run/{id}/og(id=${row.id})}">Traditional</a></li>
+                            <li th:classappend="${row.runningTraditional} ? 'disabled' : ''"><a
+                                    th:href="@{/users/run/{id}/stream(id=${row.id})}">Streams</a></li>
+                            <li><a th:href="@{/users/run/{id}/unfollow(id=${row.id})}">Unfollow all</a></li>
                         </ul>
                     </div>
                 </td>

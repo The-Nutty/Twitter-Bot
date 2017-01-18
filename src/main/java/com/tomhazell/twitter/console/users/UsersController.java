@@ -2,6 +2,7 @@ package com.tomhazell.twitter.console.users;
 
 import com.tomhazell.twitter.console.TwitterBotStreamTask;
 import com.tomhazell.twitter.console.TwitterBotTask;
+import com.tomhazell.twitter.console.TwitterBotUnfollowTask;
 import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -27,6 +28,7 @@ public class UsersController {
     public static final String ENDPOINT_INDEX = "/";
     public static final String ENDPOINT_TOGGLE_BOT_TRADITIONAL = "/users/run/{id}/og";
     public static final String ENDPOINT_TOGGLE_BOT_STREAM = "/users/run/{id}/stream";
+    public static final String ENDPOINT_RUN_BOT_UNFOLLOW = "/users/run/{id}/unfollow";
     public static final String ENDPOINT_USERS_UPDATE = "/users/update/{id}";
     public static final String ENDPOINT_USERS_CREATE = "/users/create";
 
@@ -76,6 +78,14 @@ public class UsersController {
             taskExecutor.execute(new TwitterBotStreamTask(twitterActionRepository, accountRepository, account));
         }
         accountRepository.save(account);
+        return new RedirectView(ENDPOINT_USERS);
+    }
+
+    @RequestMapping(ENDPOINT_RUN_BOT_UNFOLLOW)
+    public RedirectView runUnfollowUser(@PathVariable("id") Long userId) {
+        Account account = accountRepository.findOne(userId);
+        TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+        taskExecutor.execute(new TwitterBotUnfollowTask(twitterActionRepository, accountRepository, account));
         return new RedirectView(ENDPOINT_USERS);
     }
 

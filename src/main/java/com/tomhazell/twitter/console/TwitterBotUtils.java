@@ -63,7 +63,7 @@ public class TwitterBotUtils {
             if (!action.isHasRetweeted()) {//check that we have not already retweted
                 retweet(tweet, action, twitter);
             }
-            if (!action.isHasFollowed()) {//check that we have not already followed
+            if (action.getNumFollows() == 0) {//check that we have not already followed
                 follow(tweet, action, twitter);
             }
         }
@@ -116,7 +116,7 @@ public class TwitterBotUtils {
             TwitterBotUtils.sleep(TwitterBotApplication.FOLLOW_TIME_OUT);
         }
 
-        action.setHasFollowed(true);
+        action.setNumFollows(userToFollow.size());
     }
 
     public static void retweet(Status tweet, TwitterAction action, Twitter twitter) throws TwitterException {

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="fragments/common_includes :: head"></head>
+<body>
+<div class="container">
+
+    <nav th:replace="fragments/navbar :: navbar"></nav>
+    <div class="page-header">
+        <h1 th:text="${isEdit} ? 'Update User' : 'Add User'"></h1>
+    </div>
+
+    <form name="create_user" role="form" enctype="multipart/form-data" action="#"
+          th:action="@{/users/create}"
+          th:object="${account}" method="post">
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="form-group">
+            <label>Name*</label>
+            <input class="form-control" type="text"
+                   placeholder="Name"
+                   th:field="*{name}" required="required" maxlength="255"/>
+        </div>
+
+        <div class="form-group">
+            <label>Query's* (Search query's separated by commas)</label>
+            <input class="form-control" type="text"
+                   placeholder="Query1,Query2"
+                   th:field="*{query}" required="required" maxlength="255"/>
+        </div>
+
+        <div class="form-group">
+            <label>Stream Filters* (words that will be filtered out when using streams mode, separated by commas)</label>
+            <input class="form-control" type="text"
+                   placeholder="Filter 1,Filter 2"
+                   th:field="*{streamFilters}" required="required" maxlength="255"/>
+        </div>
+
+        <div class="form-group">
+            <label for="type">Result Type</label>
+            <select class="form-control" id="type" th:field="*{resultType}">
+                <option th:each="type : ${T(twitter4j.Query.ResultType).values()}" th:id="${{type}}"
+                        th:value="${{type}}"
+                        th:text="${{type}}"
+                        required="required">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-6 form-group">
+                <label>Consumer Key*</label>
+                <input class="form-control" type="text" placeholder="Consumer Key"
+                       th:field="*{consumerKey}"
+                       required="required"
+                       maxlength="255"/>
+            </div>
+            <div class="col-sm-6 form-group">
+                <label>Consumer Secret*</label>
+                <input class="form-control" type="text" placeholder="Consumer Secret"
+                       th:field="*{consumerSecret}"
+                       required="required"
+                       maxlength="255"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-6 form-group">
+                <label>Token*</label>
+                <input class="form-control" type="text" placeholder="Token"
+                       th:field="*{token}"
+                       required="required"
+                       maxlength="255"/>
+            </div>
+            <div class="col-sm-6 form-group">
+                <label>Token Secret*</label>
+                <input class="form-control" type="text" placeholder="Token Secret"
+                       th:field="*{tokenSecret}"
+                       required="required"
+                       maxlength="255"/>
+            </div>
+        </div>
+
+        <button th:text="${isEdit} ? 'Update' : 'Create'" class="btn btn-lg btn-primary" type="submit">Create</button>
+    </form>
+</div>
+</body>
+</html>

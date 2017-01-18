@@ -19,6 +19,8 @@ import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COO
 
 /**
  * This is the call where all the actual botting happens.
+ *
+ * Depricated in favor of TwitterBotStreamTask
  */
 public class TwitterBotTask implements Runnable {
 

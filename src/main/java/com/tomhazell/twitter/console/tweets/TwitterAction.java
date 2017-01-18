@@ -27,7 +27,7 @@ public class TwitterAction {
     private boolean hasReplyed;
     private boolean hasLiked;
     private boolean hasRetweeted;
-    private boolean hasFollowed;
+    private int numFollows;
 
     private String tweetContents;
 
@@ -79,12 +79,12 @@ public class TwitterAction {
         this.tweetId = tweetId;
     }
 
-    public boolean isHasFollowed() {
-        return hasFollowed;
+    public int getNumFollows() {
+        return numFollows;
     }
 
-    public void setHasFollowed(boolean hasFollowed) {
-        this.hasFollowed = hasFollowed;
+    public void setNumFollows(int numFollows) {
+        this.numFollows = numFollows;
     }
 
     public boolean isHasReplyed() {

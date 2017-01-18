@@ -1,0 +1,12 @@
+[
+  {
+    "name" : "Tom Hazell",
+    "query" : "sweepstake RT,RT to win,rt to win csgo,retweet to win csgo,steam code giveaway,#RTtoWIN,retweet win gift card,retweet to win,giveaway RT,#FreebieFriday",
+    "token" : "312793406-7HmhkEEslS8bb2eTXBRtLgqUM3StVHN4fvWwJGd2",
+    "tokenSecret" : "n3WdZW9H9fWZRZB9ZKGpkskRNASzL8xqlFMLFOFyuAhq1",
+    "consumerKey" : "EmvJkPOWWnnnc8hCEI1lOrTd5",
+    "consumerSecret" : "heskyMCyUFactHqS0us48BRHRPdcKKQCgO1tYocbWAlyFMLBOV",
+    "resultType" : "recent",
+    "streamFilters" : "makeup,vote,palette"
+  }
+]
