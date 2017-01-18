@@ -25,7 +25,7 @@
                 <th>Is the bot running in traditional mode?</th>
                 <th>Is the bot running is stream mode?</th>
                 <th>Is the bot on rate limit cool down (10 mins)?</th>
-                <th>Toggle Running</th>
+                <th>Run or Toggle Task</th>
                 <th>Update</th>
             </tr>
             </thead>
@@ -40,9 +40,7 @@
                 <td th:text="${row.onRatelimitCooldown}"></td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Toggle
-                            Running
-                            Modes
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Tasks
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu">
                             <li th:classappend="${row.runningStream} ? 'disabled' : ''"><a
