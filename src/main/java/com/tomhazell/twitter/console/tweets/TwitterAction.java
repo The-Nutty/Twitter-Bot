@@ -29,6 +29,8 @@ public class TwitterAction {
     private boolean hasRetweeted;
     private int numFollows;
 
+    //7(Max num of chars required to store a char(in unicode format))*141(max length of tweet + 1) = 987
+    @Column(length = 987)
     private String tweetContents;
 
     public Calendar getDateCreated() {
