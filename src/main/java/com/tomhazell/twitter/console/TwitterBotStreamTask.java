@@ -135,7 +135,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         //since we are now getting loads of tweets we should make sure that the queue dose not get to long and be more picky/filter TODO
         for (String filter : account.getStreamFilters().split(",")) {
             if (status.getText().toLowerCase().contains(filter.toLowerCase())) {
-                logger.info("Not adding tweet as it contains filtered word: " + filter);
+                logger.info(account.getName() + ": Not adding tweet as it contains filtered word: " + filter);
                 return;
             }
         }
@@ -143,7 +143,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
         //i think there is a beater solution to this but implement a max queue length for the mean time as we get tweets way more than we can action on them
         if (queue.size() > 40) {
-            logger.info("Not adding tweet to queue as we already have 40 things in it, removing lisener");//try un regesteing the lisener
+            logger.info(account.getName() + ": Not adding tweet to queue as we already have 40 things in it, removing lisener");//try un regesteing the lisener
             twitterStream.removeListener(this);
             isQueueFull = true;
             return;
@@ -151,10 +151,10 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
         //check if we have actioned on this tweet already
         if (twitterActionRepository.findOneByAccountAndTweetId(account, status.getId()) == null) {
-            logger.info("got status");
+            logger.info(account.getName() + ": got status");
             queue.add(status);
         } else {
-            logger.info("got status we have already used");
+            logger.info(account.getName() + ": got status we have already used");
         }
     }
 
@@ -181,5 +181,11 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
     @Override
     public void onException(Exception ex) {
         logger.error("Twiter Stream exception", ex);
+
+        //update DB to show stream has died
+        account = accountRepository.findOne(account.getId());
+        account.setRunningStream(false);
+        accountRepository.save(account);
+
     }
 }
