@@ -43,47 +43,56 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
 
     @Override
     public void run() {
-        twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
+        try {
+            twitter = new TwitterFactory().getInstance();
+            twitter.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
 
-        AccessToken token = new AccessToken(account.getToken(), account.getTokenSecret());
-        twitter.setOAuthAccessToken(token);
+            AccessToken token = new AccessToken(account.getToken(), account.getTokenSecret());
+            twitter.setOAuthAccessToken(token);
 
-        //im not sure what authentication is nessery
-        twitterStream = new TwitterStreamFactory().getInstance();
-        twitterStream.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
-        twitterStream.setOAuthAccessToken(new AccessToken(account.getToken(), account.getTokenSecret()));
-        twitterStream.addListener(this);
+            //im not sure what authentication is nessery
+            twitterStream = new TwitterStreamFactory().getInstance();
+            twitterStream.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
+            twitterStream.setOAuthAccessToken(new AccessToken(account.getToken(), account.getTokenSecret()));
+            twitterStream.addListener(this);
 
 //        start streams api
-        FilterQuery query = new FilterQuery(account.getQuery().split(","));
-        twitterStream.filter(query);
+            FilterQuery query = new FilterQuery(account.getQuery().split(","));
+            twitterStream.filter(query);
 
-        //iterate through the queue while we should be running. and Action on each tweet
-        while ((account = accountRepository.findOne(account.getId())).isRunningStream()) {//TODO we may want to do this less regularly?
-            if (queue.size() > 0) {
-                Status last = queue.getLast();
-                queue.removeLast();
+            //iterate through the queue while we should be running. and Action on each tweet
+            while ((account = accountRepository.findOne(account.getId())).isRunningStream()) {//TODO we may want to do this less regularly?
+                if (queue.size() > 0) {
+                    Status last = queue.getLast();
+                    queue.removeLast();
 
-                if (queue.size() < 20 && isQueueFull){
-                    logger.info("queue size is smaller than 20 so re adding listener");
-                    twitterStream.addListener(this);
-                    isQueueFull = false;
-                }
+                    if (queue.size() < 20 && isQueueFull) {
+                        logger.info("queue size is smaller than 20 so re adding listener");
+                        twitterStream.addListener(this);
+                        isQueueFull = false;
+                    }
 
                     logger.info("Interacting with tweet with ID " + last.getId());
 
-                try {
-                    twitterActionRepository.save(TwitterBotUtils.interactWithTweet(twitter, last, account, "Stream:" + account.getQuery()));
-                } catch (TwitterException e) {
-                    TwitterBotUtils.handleTwitterError(e, account, accountRepository);
+                    try {
+                        twitterActionRepository.save(TwitterBotUtils.interactWithTweet(twitter, last, account, "Stream:" + account.getQuery()));
+                    } catch (TwitterException e) {
+                        TwitterBotUtils.handleTwitterError(e, account, accountRepository);
+                    }
                 }
-            }
-        }
 
-        //clean up stream
-        twitterStream.clearListeners();
-        twitterStream.cleanUp();
+            }
+
+            //clean up stream
+            twitterStream.clearListeners();
+            twitterStream.cleanUp();
+        } catch (Exception e) {
+            //update DB to show stream has died
+            account = accountRepository.findOne(account.getId());
+            account.setRunningStream(false);
+            accountRepository.save(account);
+            throw e;//throw exception anyway
+        }
     }
 
     //all the methods from the stream lisener
