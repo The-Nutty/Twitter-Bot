@@ -87,6 +87,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
             twitterStream.clearListeners();
             twitterStream.cleanUp();
         } catch (Exception e) {
+            logger.error("Twiter Stream loop exception", e);
             //update DB to show stream has died
             account = accountRepository.findOne(account.getId());
             account.setRunningStream(false);
