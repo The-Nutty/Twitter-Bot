@@ -15,12 +15,9 @@ import static com.tomhazell.twitter.console.TwitterBotApplication.FRIEND_LIST_TI
 import static com.tomhazell.twitter.console.TwitterBotApplication.UNFOLLOW_TIME_OUT;
 
 /**
- * Created by Tom Hazell on 17/01/2017.
+ * This will unfollow all people that the account is following appart from the first 50 people it followed
  */
 public class TwitterBotUnfollowTask implements Runnable {
-
-    public static final int FOLLOWING_TIPPING_POINT = 4900;//the followers over which we will remove the
-    public static final int FOLLOWERS_TO_REMOVE = 100;//number of followers to remove after we hit the tipping point
 
     private TwitterActionRepository twitterActionRepository;
     private AccountRepository accountRepository;
@@ -73,9 +70,9 @@ public class TwitterBotUnfollowTask implements Runnable {
         }
 
         //un follow all friends
-        for (User friend : friends) {
+        for (int i1 = 0; i1 < friends.size() - 50; i1++) {
             try {
-                twitter.destroyFriendship(friend.getId());
+                twitter.destroyFriendship(friends.get(i1).getId());
                 TwitterBotUtils.sleep(UNFOLLOW_TIME_OUT);
             } catch (TwitterException e) {
                 TwitterBotUtils.handleTwitterError(e, account, accountRepository);

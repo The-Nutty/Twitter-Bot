@@ -1,6 +1,5 @@
 package com.tomhazell.twitter.console;
 
-import com.tomhazell.twitter.console.tweets.TwitterAction;
 import com.tomhazell.twitter.console.tweets.TwitterActionRepository;
 import com.tomhazell.twitter.console.users.Account;
 import com.tomhazell.twitter.console.users.AccountRepository;
@@ -8,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
-import twitter4j.util.function.Consumer;
 
 import java.util.LinkedList;
 
@@ -151,7 +149,7 @@ public class TwitterBotStreamTask implements Runnable, StatusListener {
         }
 
         //check if we have actioned on this tweet already
-        if (twitterActionRepository.findOneByAccountAndTweetId(account, status.getId()) == null) {
+        if (twitterActionRepository.findAllByAccountAndTweetId(account, status.getId()).size() == 0) {
             logger.info(account.getName() + ": got status");
             queue.add(status);
         } else {

@@ -11,11 +11,6 @@ import twitter4j.auth.AccessToken;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.tomhazell.twitter.console.TwitterBotApplication.RATE_LIMIT_COOLDOWN;
 
 /**
  * This is the call where all the actual botting happens.
@@ -142,7 +137,7 @@ public class TwitterBotTask implements Runnable {
                 } catch (TwitterException e) {
                     TwitterBotUtils.handleTwitterError(e, account, accountRepository);
                 }
-            } else if (twitterActionRepository.findOneByAccountAndTweetId(account, tweet.getId()) != null) {
+            } else if (twitterActionRepository.findAllByAccountAndTweetId(account, tweet.getId()) != null) {
                 // in this case we have already delt with the tweet so ignore it
                 logger.error("We have already actioned on this tweet so ignoring it.");
             } else {
