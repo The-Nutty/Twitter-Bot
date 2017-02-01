@@ -37,6 +37,7 @@ public class TwitterBotUnfollowTask implements Runnable {
 
     @Override
     public void run() {
+        logger.info("Starting Unfollow task for " + account.getName());
         twitter = new TwitterFactory().getInstance();
         twitter.setOAuthConsumer(account.getConsumerKey(), account.getConsumerSecret());
 
@@ -59,6 +60,7 @@ public class TwitterBotUnfollowTask implements Runnable {
         int i = 0;
         while (i < user.getFriendsCount() - 1) {
             try {
+                logger.info("Getting frends for index " + i);
                 PagableResponseList<User> friendsList = twitter.getFriendsList(user.getId(), cursor, 200);
                 cursor = friendsList.getNextCursor();
                 friends.addAll(friendsList);
@@ -78,5 +80,6 @@ public class TwitterBotUnfollowTask implements Runnable {
                 TwitterBotUtils.handleTwitterError(e, account, accountRepository);
             }
         }
+        logger.info("completed unfollow task for " + account.getName());
     }
 }
